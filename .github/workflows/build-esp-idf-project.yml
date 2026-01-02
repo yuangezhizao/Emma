@@ -1,0 +1,77 @@
+name: Build ESP-IDF project
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - dev
+
+env:
+  ESP_IDF_TARGET: ESP32S3
+  ARTIFACT_BOOTLOADER_BIN_PATH: build/bootloader/bootloader.bin
+  ARTIFACT_PARTITION_TABLE_BIN_PATH: build/partition_table/partition-table.bin
+  ARTIFACT_APP_BIN_PATH: build/Emma.bin
+
+jobs:
+  build:
+    continue-on-error: ${{ matrix.experimental }}
+
+    strategy:
+      fail-fast: true
+      matrix:
+        os:
+          - ubuntu-latest
+        esp_idf_version:
+          - release-v5.5
+          - release-v5.4
+          - release-v5.3
+        experimental:
+          - false
+        include:
+          - os: ubuntu-latest
+            esp_idf_version: latest
+            experimental: true
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - name: 📤 Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: 🛠️ Build ESP-IDF project
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: ${{ matrix.esp_idf_version }}
+          target: ${{ env.ESP_IDF_TARGET }}
+
+      - name: 📏 Show size by idf.py
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: ${{ matrix.esp_idf_version }}
+          target: ${{ env.ESP_IDF_TARGET }}
+          command: |
+            idf.py size
+            idf.py size-components
+            idf.py size-files
+
+      - name: ℹ️ Show image_info by esptool.py
+        uses: espressif/esp-idf-ci-action@v1
+        with:
+          esp_idf_version: ${{ matrix.esp_idf_version }}
+          target: ${{ env.ESP_IDF_TARGET }}
+          command: |
+            esptool.py image_info ${{ env.ARTIFACT_BOOTLOADER_BIN_PATH }} --version 2
+            echo -e
+            esptool.py image_info ${{ env.ARTIFACT_APP_BIN_PATH }} --version 2
+
+      - name: 📦 Upload build artifacts (include binary images)
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ env.ESP_IDF_TARGET }}-build-artifacts_on-${{ matrix.os }}_with-esp-idf-${{ matrix.esp_idf_version }}
+          path: |
+            build
+            # ${{ env.ARTIFACT_BOOTLOADER_BIN_PATH }}
+            # ${{ env.ARTIFACT_PARTITION_TABLE_BIN_PATH }}
+            # ${{ env.ARTIFACT_APP_BIN_PATH }}
