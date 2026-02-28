@@ -1,0 +1,11 @@
+# Emma Factory Test - Default Configuration
+CONFIG_IDF_TARGET="esp32s3"
+
+# Increase main task stack for factory tests
+CONFIG_ESP_MAIN_TASK_STACK_SIZE=8192
+
+# Flash size: auto-detect during flashing
+CONFIG_ESPTOOLPY_HEADER_FLASHSIZE_UPDATE=y
+
+# Use built-in single-app large partition table (factory app ~3.4MB)
+CONFIG_PARTITION_TABLE_SINGLE_APP_LARGE=y
