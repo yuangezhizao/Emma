@@ -1,0 +1,8 @@
+# Emma Factory Test - ESP32-S3 Specific Configuration
+
+# USB Console (native USB Serial/JTAG)
+CONFIG_ESP_CONSOLE_USB_SERIAL_JTAG=y
+
+# Bluetooth (BLE only, ESP32-S3 does not support Classic BT)
+CONFIG_BT_ENABLED=y
+CONFIG_BT_BLE_42_FEATURES_SUPPORTED=y
