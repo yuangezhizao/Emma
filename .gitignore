@@ -33,3 +33,8 @@
 
 # ESP-IDF Components
 dependencies
+
+# ESP-IDF build output and generated config
+build/
+sdkconfig
+sdkconfig.old

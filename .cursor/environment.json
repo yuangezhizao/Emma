@@ -1,0 +1,4 @@
+{
+  "name": "Emma ESP-IDF (ESP32-S3)",
+  "install": "bash .cursor/install.sh"
+}
